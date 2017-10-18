@@ -30,19 +30,23 @@ public class EscuchaCliente extends Thread {
 			String cadenaLeida = entrada.readLine();
 			String[] partesCadena = cadenaLeida.split("\\s+");
 
-			while (partesCadena[0] != IMensajes.FINALIZAR) /* no DESCONECTAR */
+			System.out.println(partesCadena[0]);
+			while (!partesCadena[0].equals(IMensajes.FINALIZAR)) /* no DESCONECTAR */
 			{
-				
-				if(cadenaLeida.charAt(0) == IMensajes.DESTINO_PUNTUAL.charAt(0)) {
+				if (cadenaLeida.charAt(0) == IMensajes.DESTINO_PUNTUAL.charAt(0)) {
 					for (EscuchaCliente clienteAjeno : Server.getClientesConectados().values()) {
 						String receptor = partesCadena[0].substring(1);
-						if(clienteAjeno.user.getNick().equals(receptor) && !(receptor.equals(user.getNick())));
-						{
-							clienteAjeno.salida.println("(whisp)"+user.getNick() + ": " + cadenaLeida.substring(partesCadena[0].length()).trim());
+						if (clienteAjeno.user.getNick().equals(receptor) && !(receptor.equals(user.getNick()))) {
+							clienteAjeno.salida.println("(whisp)" + user.getNick() + ": "
+									+ cadenaLeida.substring(partesCadena[0].length()).trim());
 						}
 					}
-				}else {
-				
+				} else if (partesCadena[0].equals(IMensajes.LISTADO)) {
+					salida.println("Usuarios conectados:");
+					for (EscuchaCliente clienteAjeno : Server.getClientesConectados().values()) {
+						salida.println(clienteAjeno.user.getNick());
+					}
+				} else {
 					for (EscuchaCliente clienteAjeno : Server.getClientesConectados().values()) {
 						clienteAjeno.salida.println(user.getNick() + ": " + cadenaLeida);
 					}
@@ -58,6 +62,7 @@ public class EscuchaCliente extends Thread {
 
 			Server.getClientesConectados().remove(numeroUser);
 			Server.getInfoDeClientes().remove(numeroUser);
+			System.out.println("Usuario " + user.getNick() + " desconectado.");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
